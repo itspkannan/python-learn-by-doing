@@ -1,2 +1,3 @@
-# python_commons
-Common Python code that I use across multiple projects
+# Learn Python by doing
+
+1. Common libraries used across projects.
