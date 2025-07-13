@@ -1,0 +1,28 @@
+[project]
+name = "observability"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Priyesh Kannan",email = "10197527+PriyeshKannan@users.noreply.github.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "opentelemetry-api (>=1.35.0,<2.0.0)",
+    "opentelemetry-sdk (>=1.35.0,<2.0.0)",
+    "opentelemetry-exporter-otlp-proto-grpc (>=1.35.0,<2.0.0)",
+]
+
+[tool.poetry]
+packages = [{include = "observability", from = "src"}]
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.12.3"
+mypy = "^1.16.1"
+pytest = "^8.4.1"
+pytest-asyncio = "^1.0.0"
+pytest-mock = "^3.14.1"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
