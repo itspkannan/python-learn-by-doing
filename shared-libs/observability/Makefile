@@ -36,9 +36,8 @@ help:  ## 📖 Help message
 .PHONY: init.python
 init.python: ## 🧰 Initialize the Poetry development environment
 	@echo "[Info] $(PROJECT_DESCRIPTION) Initialization of development Environment - Started"
-	$(eval PYTHON_VERSION=$(shell pyenv versions --bare --skip-aliases --skip-envs | grep 3.12 | sort | tail -1))
+	$(eval PYTHON_VERSION=$(shell asdf list python | grep '^  3\.12' | tr -d '*[:space:]' | sort -V | tail -1|xargs))
 	@echo "Python Version : $(PYTHON_VERSION)"
-	@pyenv local $(PYTHON_VERSION)
 	@poetry env use $(PYTHON_VERSION)
 	@$(POETRY) config virtualenvs.in-project true && \
 		$(POETRY) config installer.max-workers 10 && \
@@ -80,11 +79,12 @@ clean: clean.python ## 🧹 Cleanup temporary files created
 .PHONY: format.python
 format.python:  ## 🎨 Format code using Ruff
 	@poetry run ruff format .
+	@poetry run ruff check --fix
 
 .PHONY: lint.python
 lint.python:   ## 🔍 Run static analysis with Ruff and Mypy
 	@poetry run ruff check .
-	@poetry run mypy src/observability
+	@poetry run mypy observability
 
 .PHONY: test.python
 test.python:  ## ✅ Run tests with Pytest and show coverage

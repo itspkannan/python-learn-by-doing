@@ -1,7 +1,9 @@
 from __future__ import annotations
+
 import logging
 import os
 from dataclasses import dataclass
+
 
 @dataclass(frozen=True)
 class TracingConfig:
@@ -12,8 +14,9 @@ class TracingConfig:
     def from_env() -> TracingConfig:
         return TracingConfig(
             service_name=os.getenv("SERVICE_NAME"),
-            enabled=bool(os.getenv("TRACING_ENABLED", "False"))
+            enabled=bool(os.getenv("TRACING_ENABLED", "False")),
         )
+
 
 @dataclass(frozen=True)
 class LoggingConfig:
@@ -22,9 +25,8 @@ class LoggingConfig:
 
     @staticmethod
     def from_env() -> LoggingConfig:
-        return LoggingConfig(
-            service_name=os.getenv("SERVICE_NAME")
-        )
+        return LoggingConfig(service_name=os.getenv("SERVICE_NAME"))
+
 
 @dataclass(frozen=True)
 class MetricsConfig:
@@ -35,8 +37,9 @@ class MetricsConfig:
     def from_env() -> MetricsConfig:
         return MetricsConfig(
             service_name=os.getenv("SERVICE_NAME"),
-            enabled = bool(os.getenv("METRICS_ENABLED", "False"))
+            enabled=bool(os.getenv("METRICS_ENABLED", "False")),
         )
+
 
 @dataclass()
 class ObservabilityConfig:

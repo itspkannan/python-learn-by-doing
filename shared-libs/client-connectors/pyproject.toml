@@ -13,7 +13,7 @@ dependencies = [
 ]
 
 [tool.poetry]
-packages = [{include = "connector", from = "src"}]
+packages = [{include = "client_connectors", from="."}]
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.12.3"

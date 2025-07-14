@@ -1,14 +1,15 @@
+from contextlib import asynccontextmanager, contextmanager
+
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import SimpleSpanProcessor, ConsoleSpanExporter
+from opentelemetry.sdk.trace.export import ConsoleSpanExporter, SimpleSpanProcessor
 from opentelemetry.trace import Tracer
-from contextlib import asynccontextmanager, contextmanager
 
 from observability.config import TracingConfig
 
 
 class TracingService:
-    def __init__(self, tracing_config: TracingConfig):
+    def __init__(self, tracing_config: TracingConfig) -> None:
         self.tracing_config = tracing_config or TracingConfig.from_env()
         if self.tracing_config.enabled:
             provider = TracerProvider()
