@@ -1,72 +1,46 @@
-import asyncio
-
 import pytest
-from unittest.mock import MagicMock, patch
-from observability.metrics.service import MetricsService
-from observability.config import MetricsConfig
+
+from tests.tracer.conftest import _make_service
 
 
-@pytest.fixture
-def mock_config():
-    return MetricsConfig(enabled=True, service_name="test-service")
+def test_get_tracer_returns_same_instance(mocker):
+    service, tracer_mock, _ = _make_service(mocker, enabled=True)
+    assert service.get_tracer() is tracer_mock
 
 
-@pytest.fixture
-def service(mock_config):
-    with patch("observability.metrics.service.MetricsConfig.from_env", return_value=mock_config):
-        with patch("observability.metrics.service.set_meter_provider"):
-            with patch("observability.metrics.service.get_meter") as mock_get_meter:
-                mock_meter = MagicMock()
-                mock_get_meter.return_value = mock_meter
-                yield MetricsService()
+def test_is_enabled_reflects_config(mocker):
+    svc_true, _, _ = _make_service(mocker, enabled=True)
+    svc_false, _, _ = _make_service(mocker, enabled=False)
 
-
-def test_record_counter(service):
-    mock_counter = MagicMock()
-    service.meter.create_counter.return_value = mock_counter
-
-    with service.record("my_counter", metric_type="counter") as record_fn:
-        record_fn()
-
-    mock_counter.add.assert_called_once_with(1, {})
-
-
-def test_record_histogram(service):
-    mock_histogram = MagicMock()
-    service.meter.create_histogram.return_value = mock_histogram
-
-    with service.record("my_timer", metric_type="histogram") as record_fn:
-        # simulate a short task
-        import time
-
-        time.sleep(0.01)
-        record_fn()
-
-    assert mock_histogram.record.call_count == 1
-    recorded_value = mock_histogram.record.call_args[0][0]
-    assert recorded_value > 0  # duration should be positive
+    assert svc_true.is_enabled() is True
+    assert svc_false.is_enabled() is False
 
 
 @pytest.mark.asyncio
-async def test_arecord_counter(service):
-    mock_counter = MagicMock()
-    service.meter.create_counter.return_value = mock_counter
-
-    async with service.arecord("async_counter", metric_type="counter") as record_fn:
-        record_fn()
-
-    mock_counter.add.assert_called_once_with(1, {})
+async def test_start_span_async_enabled(mocker):
+    service, tracer_mock, span_obj = _make_service(mocker, enabled=True)
+    async with service.start_span("async-span") as span:
+        assert span is span_obj
+    tracer_mock.start_as_current_span.assert_called_once_with("async-span")
 
 
 @pytest.mark.asyncio
-async def test_arecord_histogram(service):
-    mock_histogram = MagicMock()
-    service.meter.create_histogram.return_value = mock_histogram
+async def test_start_span_async_disabled(mocker):
+    service, tracer_mock, _ = _make_service(mocker, enabled=False)
+    async with service.start_span("ignored") as span:
+        assert span is None
+    tracer_mock.start_as_current_span.assert_not_called()
 
-    async with service.arecord("async_timer", metric_type="histogram") as record_fn:
-        await asyncio.sleep(0.01)
-        record_fn()
 
-    assert mock_histogram.record.call_count == 1
-    recorded_value = mock_histogram.record.call_args[0][0]
-    assert recorded_value > 0  # duration should be positive
+def test_start_span_sync_enabled(mocker):
+    service, tracer_mock, span_obj = _make_service(mocker, enabled=True)
+    with service.start_span_sync("sync-span") as span:
+        assert span is span_obj
+    tracer_mock.start_as_current_span.assert_called_once_with("sync-span")
+
+
+def test_start_span_sync_disabled(mocker):
+    service, tracer_mock, _ = _make_service(mocker, enabled=False)
+    with service.start_span_sync("ignored") as span:
+        assert span is None
+    tracer_mock.start_as_current_span.assert_not_called()
