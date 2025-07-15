@@ -1,6 +1,6 @@
 [project]
 name = "commons_connector"
-version = "0.4.0"
+version = "0.4.1"
 description = ""
 authors = [
     {name = "Priyesh Kannan",email = "10197527+PriyeshKannan@users.noreply.github.com"}
