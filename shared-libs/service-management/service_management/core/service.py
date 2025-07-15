@@ -1,5 +1,5 @@
 import logging
-from abc import ABC
+from abc import ABC, abstractmethod
 from datetime import datetime
 
 from service_management.core import HealthStatus, Registry, RunningStatus
@@ -17,12 +17,14 @@ class Service(ABC):
         self.logger = logging.getLogger(f"service.{name}")
 
     async def start(self):
+        await self.before_start()
         start_timestamp = datetime.utcnow()
         self.start_time = start_timestamp
         self.running_status = RunningStatus.STARTED
         self.health_status = HealthStatus.HEALTHY
         Registry.register_instance(self.name, self)
         self.__log_status_change("Started", start_timestamp)
+        await self.after_start()
 
     def __log_status_change(self, action: str, timestamp: datetime) -> None:
         self.logger.info(f"{action} at {timestamp}")
@@ -35,10 +37,12 @@ class Service(ABC):
             self.start_time = timestamp
 
     async def stop(self) -> None:
+        await self.before_stop()
         stop_timestamp = datetime.utcnow()
         self._update_service_status(RunningStatus.STOPPED, stop_timestamp)
         Registry.deregister_instance(self.name)
         self.__log_status_change("Stopped", stop_timestamp)
+        await self.after_stop()
 
     def health_check(self) -> dict:
         return {
@@ -56,3 +60,19 @@ class Service(ABC):
 
     def increment_reconnects(self):
         self.reconnects += 1
+
+    @abstractmethod
+    async def before_start(self):
+        pass
+
+    @abstractmethod
+    async def after_start(self):
+        pass
+
+    @abstractmethod
+    async def before_stop(self):
+        pass
+
+    @abstractmethod
+    async def after_stop(self):
+        pass

@@ -10,11 +10,17 @@ class LoggingService(Service):
         super().__init__("LoggingService")
         self.logging_config = logging_config or LoggingConfig.from_env()
 
-    async def on_start(self):
-        self.logger.info(f"{self.name} started")
+    async def before_start(self):
+        self.logger.info(f"{self.name} starting.")
 
-    async def on_stop(self):
-        self.logger.info(f"{self.name} stopped.")
+    async def after_start(self):
+        pass
+
+    async def before_stop(self):
+        self.logger.info(f"{self.name} stopping.")
+
+    async def after_stop(self):
+        pass
 
     def get_logger(self, name: str = None):
         logger_name = name or self.logging_config.service_name

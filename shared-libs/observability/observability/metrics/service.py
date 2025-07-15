@@ -24,14 +24,20 @@ class MetricsService(Service):
         else:
             self.meter = None
 
-    async def on_start(self):
+    async def before_start(self):
+        pass
+
+    async def after_start(self):
         self.logger.info(
             "MetricsService started with metrics enabled = %s", self.metrics_config.enabled
         )
 
-    async def on_stop(self):
-        self.logger.info("MetricsService stopped.")
+    async def before_stop(self):
+        self.logger.info(f"{self.before_stop()} stopping.")
         self.meter = None
+
+    async def after_stop(self):
+        pass
 
     @contextmanager
     def record(

@@ -528,14 +528,14 @@ reference = "localpypi"
 
 [[package]]
 name = "commons-service-management"
-version = "0.2.1"
+version = "0.2.2"
 description = ""
 optional = false
 python-versions = ">=3.12"
 groups = ["main"]
 files = [
-    {file = "commons_service_management-0.2.1-py3-none-any.whl", hash = "sha256:aeee5a127a6dc5349fd8d6b493069a69d28ab10e22b107904ce7d5d33506a6b6"},
-    {file = "commons_service_management-0.2.1.tar.gz", hash = "sha256:9a577e68eec9f8d8c77c6f13c16f6e11e568d3f88842fb917e3fdab5ad0b3188"},
+    {file = "commons_service_management-0.2.2-py3-none-any.whl", hash = "sha256:56a5ce90a0f6f705c7e62d05c09c0c23ece0ac5310789b3c3a795a7e5e1645a1"},
+    {file = "commons_service_management-0.2.2.tar.gz", hash = "sha256:27f3a3c305c56c15a872f58968e68e0f1c72facff3becdaf419bb010f0f993fe"},
 ]
 
 [package.source]

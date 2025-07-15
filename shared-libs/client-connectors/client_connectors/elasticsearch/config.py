@@ -18,6 +18,5 @@ class ElasticsearchConfig:
             port=int(os.getenv("ES_PORT", 9200)),
             username=os.getenv("ES_USERNAME", "elastic"),
             password=os.getenv("ES_PASSWORD", "changeme"),
-            use_ssl=os.getenv("ES_USE_SSL", "false").lower()
-            in ("1", "true", "yes", "on"),
+            use_ssl=os.getenv("ES_USE_SSL", "false").lower() in ("1", "true", "yes", "on"),
         )

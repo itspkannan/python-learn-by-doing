@@ -10,14 +10,16 @@ from client_connectors.kakfa.config import KafkaConfig
 async def test_kafka_producer_send(mocker):
     mock_producer = AsyncMock()
     mock_start = mocker.patch("aiokafka.AIOKafkaProducer.start", new=mock_producer.start)
-    mock_send_and_wait = mocker.patch("aiokafka.AIOKafkaProducer.send_and_wait", new=mock_producer.send_and_wait)
+    mock_send_and_wait = mocker.patch(
+        "aiokafka.AIOKafkaProducer.send_and_wait", new=mock_producer.send_and_wait
+    )
     mock_stop = mocker.patch("aiokafka.AIOKafkaProducer.stop", new=mock_producer.stop)
 
     config = KafkaConfig(
         bootstrap_servers="localhost:9092",
         topic="test-topic",
         group_id="test-group",
-        enable_ssl=False
+        enable_ssl=False,
     )
     producer = KafkaProducerClient(config)
 
@@ -41,15 +43,19 @@ async def test_kafka_consumer_receive(mocker):
     ]
 
     # Patch the constructor to return our mock instance
-    mocker.patch("client_connectors.kakfa.client.AIOKafkaConsumer", return_value=mock_consumer_instance)
+    mocker.patch(
+        "client_connectors.kakfa.client.AIOKafkaConsumer", return_value=mock_consumer_instance
+    )
 
     # Create the consumer client (this will use the patched class)
-    consumer = KafkaConsumerClient(KafkaConfig(
-        bootstrap_servers="localhost:9092",
-        topic="test-topic",
-        group_id="test-group",
-        enable_ssl=False
-    ))
+    consumer = KafkaConsumerClient(
+        KafkaConfig(
+            bootstrap_servers="localhost:9092",
+            topic="test-topic",
+            group_id="test-group",
+            enable_ssl=False,
+        )
+    )
 
     await consumer.start()
 

@@ -21,14 +21,20 @@ class TracingService(Service):
             trace.set_tracer_provider(provider)
             self.tracer = trace.get_tracer(self.tracing_config.service_name)
 
-    async def on_start(self):
+    async def before_start(self):
+        pass
+
+    async def after_start(self):
         self.logger.info(
             "TracingService started with tracking enabled = %s", self.tracing_config.enabled
         )
 
-    async def on_stop(self):
-        self.logger.info("TracingService stopped.")
+    async def before_stop(self):
+        self.logger.info(f"{self.before_stop()} stopping.")
         self.tracer = None
+
+    async def after_stop(self):
+        pass
 
     @asynccontextmanager
     async def start_span(self, name: str):

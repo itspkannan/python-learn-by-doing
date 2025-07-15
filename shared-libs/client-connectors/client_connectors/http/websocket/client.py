@@ -1,9 +1,16 @@
 import logging
-
 import websockets
-from observability import ObservabilityService
+from observability.metrics.decorator import record_metric_async
+from observability.tracer.decorator import trace_span_async
 
 _logger = logging.getLogger(__name__)
+
+
+def ws_attributes(self, url: str):
+    return {
+        "service": self.__class__.__name__,
+        "websocket.url": url,
+    }
 
 
 class AsyncWebSocketClient:
@@ -18,19 +25,14 @@ class AsyncWebSocketClient:
 
 
 class TracedAsyncWebSocketClient:
-    def __init__(self, observability_service: ObservabilityService):
-        self.observability_service = observability_service
-
+    @trace_span_async("WebSocketClient.connect", attributes_fn=ws_attributes)
+    @record_metric_async(
+        name="WebSocketClient.connect.duration",
+        metric_type="histogram",
+        unit="s",
+        attributes_fn=ws_attributes,
+    )
     async def connect(self, url: str):
-        async with self.observability_service.tracing_service.start_span(f"WS CONNECT {url}"):
-            async with self.observability_service.metrics_service.arecord(
-                "ws_connect_duration", "histogram", attributes={"url": url}
-            ) as record:
-                try:
-                    _logger.info(f"Connecting to WebSocket {url}")
-                    websocket = await websockets.connect(url)
-                    record()
-                    return websocket
-                except Exception as e:
-                    _logger.error(f"WebSocket connection to {url} failed: {e}")
-                    raise
+        _logger.info(f"Connecting to WebSocket {url}")
+        websocket = await websockets.connect(url)
+        return websocket

@@ -1,10 +1,22 @@
 import json
-
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
-from service_management.service import Service
-from service_management.status import HealthStatus
 
+from service_management.core import Service, HealthStatus
 from client_connectors.kakfa.config import KafkaConfig
+
+from observability.metrics import record_metric
+from observability.tracer import trace_span
+
+from client_connectors.kakfa.interfaces import KafkaMessageHandler
+
+
+def kafka_attributes(self, key: str, value: dict):
+    return {
+        "service": self.name,
+        "messaging.system": "kafka",
+        "messaging.destination": self.config.topic,
+        "messaging.kafka.message_key": key,
+    }
 
 
 class KafkaConsumerClient(Service):
@@ -12,10 +24,9 @@ class KafkaConsumerClient(Service):
         super().__init__("KafkaConsumerClient")
         self.config = config or KafkaConfig.from_env()
         self._consumer = None
-        self._consumer = None
         self._running = False
 
-    async def start(self):
+    async def before_start(self):
         self._consumer = AIOKafkaConsumer(
             self.config.topic,
             bootstrap_servers=self.config.bootstrap_servers,
@@ -28,32 +39,46 @@ class KafkaConsumerClient(Service):
         await self._consumer.start()
         self._running = True
 
-    async def consume(self, handler):
+    async def after_start(self):
+        pass
+
+    async def before_stop(self):
+        if self._consumer:
+            await self._consumer.stop()
+        self._running = False
+
+    async def after_stop(self):
+        pass
+
+    @trace_span("KafkaConsumerClient.consume")
+    @record_metric(name="KafkaConsumerClient.events.consumed", metric_type="counter")
+    async def consume_message(self, key: str, value: dict):
+        self.increment_events()
+        self.logger.info(f"Consumed message key={key}")
+
+    async def consume(self, handler: KafkaMessageHandler = None):
         if not self._consumer:
             raise RuntimeError("Consumer not started. Call start() first.")
+
+        handler = handler or self.consume_message
+
         try:
             while self._running:
                 async for msg in self._consumer:
                     await handler(msg.key.decode("utf-8"), msg.value)
                     if not self._running:
                         break
-        finally:
-            await self._consumer.stop()
+        except Exception as e:
+            self.logger.exception("Error during consumption: %s", e)
 
-    async def stop(self):
-        self._running = False
-
-
-from opentelemetry import trace
 
 class KafkaProducerClient(Service):
-    def __init__(self, config: KafkaProducerClient = None):
+    def __init__(self, config: KafkaConfig = None):
         super().__init__("KafkaClient")
         self.config = config or KafkaConfig.from_env()
         self._producer = None
 
-    async def start(self):
-        await super().start()
+    async def before_start(self):
         try:
             self._producer = AIOKafkaProducer(
                 bootstrap_servers=self.config.bootstrap_servers,
@@ -67,27 +92,29 @@ class KafkaProducerClient(Service):
             self.logger.error(f"Failed to start KafkaProducer: {e}")
             raise e
 
+    async def after_start(self):
+        pass
+
+    async def before_stop(self):
+        if self._producer:
+            await self._producer.stop()
+
+    async def after_stop(self):
+        pass
+
+    @trace_span("KafkaProducerClient.send", attributes_fn=kafka_attributes)
+    @record_metric(
+        name="KafkaProducerClient.events.sent",
+        metric_type="counter",
+        attributes_fn=kafka_attributes,
+    )
     async def send(self, key: str, value: dict):
         if not self._producer:
             raise RuntimeError("Producer not started. Call start().")
 
-        async with self.tracer.start_as_current_span("KafkaClient.send") as span:
-            span.set_attribute("messaging.system", "kafka")
-            span.set_attribute("messaging.destination", self.config.topic)
-            span.set_attribute("messaging.kafka.message_key", key)
-
-            await self._producer.send_and_wait(
-                self.config.topic,
-                key=key.encode("utf-8"),
-                value=value,
-            )
-
-            self.increment_events()
-            if self.metrics:
-                with self.metrics.record(
-                    name=f"{self.name}.events.count",
-                    metric_type="counter",
-                    attributes={"topic": self.config.topic}
-                ) as inc:
-                    inc()
-
+        await self._producer.send_and_wait(
+            self.config.topic,
+            key=key.encode("utf-8"),
+            value=value,
+        )
+        self.increment_events()
