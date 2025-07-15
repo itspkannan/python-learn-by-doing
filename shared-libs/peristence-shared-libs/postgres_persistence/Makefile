@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
-PROJECT_DESCRIPTION = "Mongo Persistence library"
-PROJECT_NAME = "mongo_persistencey"
+PROJECT_DESCRIPTION = "Postgres Persistence library"
+PROJECT_NAME = "postgres_persistence"
 VENV = .venv
 POETRY = poetry
 PIP = pip
@@ -84,7 +84,7 @@ format.python:  ## 🎨 Format code using Ruff
 .PHONY: lint.python
 lint.python:   ## 🔍 Run static analysis with Ruff and Mypy
 	@poetry run ruff check .
-	@poetry run mypy mongo_persistence
+	@poetry run mypy postgres_persistence
 
 .PHONY: test.python
 test.python:  ## ✅ Run tests with Pytest and show coverage

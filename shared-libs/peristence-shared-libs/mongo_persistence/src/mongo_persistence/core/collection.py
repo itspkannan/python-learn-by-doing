@@ -1,4 +1,4 @@
-from typing import Any, Generic, TypeVar, Type
+from typing import Any, Generic, TypeVar
 
 from motor.motor_asyncio import AsyncIOMotorCollection
 from observability.metrics.decorator import record_metric_async
@@ -57,9 +57,9 @@ class MongoCollection(Generic[T]):
 
     @trace_span_async("MongoCollection.aggregate", attributes_fn=mongo_attrs)
     async def aggregate(
-            self,
-            pipeline: list[dict],
-            result_model: Type[AggT] | None = None,
+        self,
+        pipeline: list[dict],
+        result_model: type[AggT] | None = None,
     ) -> list[AggT] | list[T] | list[dict]:
         cursor = self.collection.aggregate(pipeline)
         model = result_model or self.model_cls

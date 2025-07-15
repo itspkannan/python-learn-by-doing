@@ -1,20 +1,23 @@
 [project]
-name = "mongo-persistence"
-version = "0.2.0"
+name = "postgres-persistence"
+version = "0.1.0"
 description = ""
 authors = [
     {name = "Priyesh Kannan",email = "10197527+PriyeshKannan@users.noreply.github.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.12,<4.0"
+requires-python = ">=3.12,<4.0.0"
 
 [tool.poetry]
-packages = [{include = "mongo_persistence", from = "src"}]
+packages = [{include = "postgres_persistence", from = "src"}]
 
 [tool.poetry.dependencies]
-motor = "^3.3.1"
-pydantic = "^2.0.0"
-commons-observability = ">=0.3.2,<1.0.0"
+asyncpg="^0.30.0"
+pydantic = "^2.11.7"
+sqlalchemy = "^2.0.41"
+tenacity = "^9.1.2"
+commons-observability = "^0.4.2"
+greenlet = "^3.2.3"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.12.3"
@@ -26,16 +29,16 @@ pytest-cov = "^6.2.1"
 report = "^0.0.1"
 testcontainers = "^4.10.0"
 
-
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
 
 [tool.ruff]
 line-length = 100
 target-version = "py312"
 fix = true
-src = ["mongo_persistence"]
+src = ["postgress_persistence"]
 exclude = [
     "tests",
     "test_*.py",
@@ -60,7 +63,7 @@ exclude = ["test/*"]
 strict = true
 
 [tool.pytest.ini_options]
-addopts = "-ra -q -s --cov=mongo_persistence --cov-report=term-missing"
+addopts = "-ra -s --cov=postgres_persistence --cov-report=term-missing"
 testpaths = ["tests"]
 
 
