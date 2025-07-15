@@ -7,8 +7,8 @@ This folder contains helper tools and utilities to support local development, te
 ```
 tools/
 ├── localpypi/     # Setup for running a local PyPI server using Docker
-│   ├── Makefile   # Make targets for starting, uploading, and managing packages
-│   └── README.md  # Usage instructions for local PyPI
+├     ├── Makefile   # Make targets for starting, uploading, and managing packages
+├     └── README.md  # Usage instructions for local PyPI
 └── scripts/       # Generic reusable scripts (e.g., setup, CI helpers, etc.)
 ```
 

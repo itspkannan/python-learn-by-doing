@@ -1,10 +1,20 @@
 import logging
-
 import websockets
+from observability import ObservabilityService
 
-from observability.observability_service import ObservabilityService
 
 _logger = logging.getLogger(__name__)
+
+
+class AsyncWebSocketClient:
+    async def connect(self, url: str):
+        try:
+            _logger.info(f"Connecting to WebSocket {url}")
+            websocket = await websockets.connect(url)
+            return websocket
+        except Exception as e:
+            _logger.error(f"WebSocket connection to {url} failed: {e}")
+            raise
 
 
 class TracedAsyncWebSocketClient:

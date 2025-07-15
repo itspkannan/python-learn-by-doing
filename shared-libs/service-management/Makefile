@@ -1,11 +1,4 @@
-HOST ?= 127.0.0.1
-PORT ?= 3141
-LOCAL_PYPI_USER ?= pypiuser
-LOCAL_PYPI_PASSWORD ?= secret
-INDEX ?= dev
-FULL_INDEX := $(LOCAL_PYPI_USER)/$(INDEX)
-BASE_URL := http://$(HOST):$(PORT)
-
+.DEFAULT_GOAL := help
 PROJECT_DESCRIPTION = "observability library"
 PROJECT_NAME = "observability"
 VENV = .venv
@@ -23,7 +16,6 @@ endif
 ifeq ($(UNAME_S),Darwin)
 	POETRY_AUTH_CONF := $(addsuffix /auth.toml,$(POETRY_HOME))
 endif
-
 
 .PHONY: help
 help:  ## 📖 Help message
@@ -102,15 +94,3 @@ test.python:  ## ✅ Run tests with Pytest and show coverage
 
 .PHONY: test
 test:  test.python ## ✅ Run tests
-
-# publish:  ## 📦 Publish built package to Devpi
-# 	@echo "Uploading package to localpypi..."
-# 	@poetry run devpi use $(BASE_URL)
-# 	@poetry run devpi  login $(LOCAL_PYPI_USER) --password=$(LOCAL_PYPI_PASSWORD)
-# 	@poetry run devpi use $(FULL_INDEX)
-# 	@echo "🚀 Uploading package to Devpi index $(FULL_INDEX)..."
-# 	@poetry run devpi upload
-
-publish:
-	@poetry config repositories.devpi http://localhost:3141/pypiuser/dev
-	@poetry publish -r localpypi --username pypiuser --password secret

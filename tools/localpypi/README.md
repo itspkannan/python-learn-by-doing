@@ -8,10 +8,10 @@
 
 ## ⚙️ Workflow Summary
 
-1. **Run Devpi Server**:
+1. **start Devpi Server**:
 
    ```bash
-   make run
+   make start
    ```
 
 2. **Initialize Devpi (user, index)**:
@@ -26,17 +26,6 @@
    make login
    ```
 
-4. **Build Package with Poetry**:
-
-   ```bash
-   make build
-   ```
-
-5. **Upload Package with Twine**:
-
-   ```bash
-   make upload
-   ```
 
 ## 📦 Poetry Configuration to Use Devpi
 
@@ -67,13 +56,33 @@ poetry config http-basic.devpi myuser secret
 poetry publish --build -r devpi
 ```
 
+```mermaid
+flowchart TD
+    A[🔧 make init] --> B1[🐳 start - Run Devpi with Docker Compose]
+    B1 --> B2[🐍 venv - Create virtualenv]
+    B2 --> B3[📦 install-deps - Install devpi-client & twine]
+    B3 --> B4[🔐 login-root - Login as root]
+    B4 --> B5[👤 create-user - Create LOCAL_PYPI_USER]
+    B5 --> B6[📦 create-index - Create user index]
+    B6 --> B7[📍 use-index - Use the target index]
 
-### 🔁 Summary Table
+    subgraph Daily Dev Flow
+        D1[🔧 make build - Build Python package]
+        D2[🚀 make upload - Upload to Devpi]
+    end
+    B7 --> Daily_Dev
+    Daily_Dev --> D1
+    D1 --> D2
 
-| Step       | Command                                    | Description            |
-| ---------- | ------------------------------------------ | ---------------------- |
-| Run server | `make run`                                 | Starts Devpi in Docker |
-| Init index | `make init`                                | Sets up user and index |
-| Login      | `make login`                               | Logs in to Devpi       |
-| Build      | `make build`                               | Builds Python package  |
-| Upload     | `make upload` or `poetry publish -r devpi` | Uploads to Devpi       |
+    subgraph Restart Flow
+        R1[make start - Restart Devpi]
+        R2[make login - Login as user]
+        R3[make use-index - Reuse the index]
+    end
+    R1 --> R2 --> R3
+
+    subgraph Clean Up
+        C1[🧹 make clean - Stop Docker and clean volume & venv]
+    end
+
+```

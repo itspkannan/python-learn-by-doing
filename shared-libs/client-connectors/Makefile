@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
-PROJECT_DESCRIPTION = "observability library"
-PROJECT_NAME = "observability"
+PROJECT_DESCRIPTION = "Client Connector library"
+PROJECT_NAME = "Client Connector"
 VENV = .venv
 POETRY = poetry
 PIP = pip

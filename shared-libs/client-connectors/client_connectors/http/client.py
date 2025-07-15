@@ -1,10 +1,12 @@
+from abc import ABC
 import httpx
 import logging
 
+from observability import ObservabilityService
+
 _logger = logging.getLogger(__name__)
 
-
-class AsyncHTTPClient:
+class AbstractBaseHttpClient(ABC):
     def __init__(self, timeout: float = 10.0):
         self.client = httpx.AsyncClient(timeout=timeout)
 
@@ -40,3 +42,27 @@ class AsyncHTTPClient:
 
     async def close(self):
         await self.client.aclose()
+
+class AsyncHTTPClient(AbstractBaseHttpClient):
+    def __int__(self, timeout: float = 10.0):
+        super().__init__(timeout)
+
+class TracedAsyncHTTPClient(AbstractBaseHttpClient):
+    def __init__(self, observability_service: ObservabilityService, timeout: float = 10.0):
+        super().__init__(timeout)
+        self.observability_service = observability_service
+
+    async def request(self, method: str, url: str, **kwargs):
+        async with self.observability_service.metrics_service.arecord(
+            f"http_{method.lower()}_duration",
+            "histogram",
+            attributes={"method": method.upper(), "url": url},
+        ) as record:
+            try:
+                response = await self.client.request(method, url, **kwargs)
+                _logger.info(f"{method.upper()} {url} → {response.status_code}")
+                record()  # Record the metric
+                return response
+            except Exception as e:
+                _logger.error(f"{method.upper()} {url} failed: {e}")
+                raise

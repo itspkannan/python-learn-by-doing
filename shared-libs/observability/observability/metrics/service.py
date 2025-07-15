@@ -60,8 +60,13 @@ class MetricsService:
             elif metric_type == "histogram":
                 metric = self.meter.create_histogram(name=name, unit=unit, description=description)
                 start_time = asyncio.get_event_loop().time()
-                yield lambda: metric.record(
-                    asyncio.get_event_loop().time() - start_time, attributes or {}
-                )
+                # Track elapsed time asynchronously inside the context manager
+                try:
+                    yield lambda: metric.record(
+                        asyncio.get_event_loop().time() - start_time, attributes or {}
+                    )
+                finally:
+                    # Capture any end-of-task or cleanup code here if needed
+                    pass
             else:
                 yield lambda: None

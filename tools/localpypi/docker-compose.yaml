@@ -1,0 +1,19 @@
+
+services:
+  localpypi:
+    image: jonasal/devpi-server:latest
+    container_name: localpypi
+    hostname: localpypi
+    environment:
+      DEVPI_PASSWORD: "rootpassword"
+    ports:
+      - "127.0.0.1:3141:3141"
+    volumes:
+      - ${DATA_DIR:-./devpi-data}:${SERVERDIR:-/devpi/server}
+    command: --serverdir ${SERVERDIR:-/devpi/server} --host 0.0.0.0 --port 3141
+    networks:
+      - localpypinet
+networks:
+  localpypinet:
+    name: localpypinet
+    driver: bridge

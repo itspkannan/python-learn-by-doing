@@ -1,14 +1,20 @@
-DOCKER_IMAGE = ghcr.io/devpi/devpi
-CONTAINER_NAME = devpi
+# 🐳 Devpi Docker Configuration
+DOCKER_IMAGE = jonasal/devpi-server:latest
+CONTAINER_NAME = localpypi
 HOST_PORT = 3141
 DATA_DIR = ./devpi-data
-SERVERDIR = /data
+SERVERDIR = /devpi/server
 
-USER = myuser
-PASSWORD = secret
-INDEX = $(USER)/dev
+HOST ?= localhost
+PORT ?= 3141
+LOCAL_PYPI_USER ?= pypiuser
+LOCAL_PYPI_PASSWORD ?= secret
+INDEX ?= dev
+FULL_INDEX := $(LOCAL_PYPI_USER)/$(INDEX)
+BASE_URL := http://$(HOST):$(PORT)
+VENV_DIR := .devpi-tmp-venv
 
-.PHONY: help run init upload stop clean login build
+.PHONY: help start stop venv install-deps login-root login create-user create-index use-index upload clean init build
 
 help:  ## 📖 Show this help message
 	@echo ""
@@ -24,39 +30,55 @@ help:  ## 📖 Show this help message
 	}' $(MAKEFILE_LIST) | sort
 	@echo ""
 
-run:  ## 🚀 Run devpi server in Docker
-	@echo "Starting devpi server on http://localhost:$(HOST_PORT)"
-	docker run -d --name $(CONTAINER_NAME) -p $(HOST_PORT):3141 -v $(DATA_DIR):$(SERVERDIR) $(DOCKER_IMAGE) \
-		devpi-server --serverdir $(SERVERDIR) --host 0.0.0.0 --port 3141
+start:  ## 🐳 Start Devpi with Docker Compose
+	@docker compose up -d
 
-init:  ## 🔧 Initialize devpi server (user, index)
-	@echo "Waiting for devpi server to be ready..."
-	sleep 3
-	pip install -q devpi-client
-	devpi use http://localhost:$(HOST_PORT)
-	devpi login root --password=''
-	-devpi user -c $(USER) password=$(PASSWORD)
-	devpi login $(USER) --password=$(PASSWORD)
-	-devpi index -c $(INDEX)
-	devpi use $(INDEX)
+stop:  ## 🛑 Stop Devpi Docker Compose
+	@docker compose down -v
 
-login:  ## 🔐 Login to devpi server
-	devpi use http://localhost:$(HOST_PORT)/$(INDEX)
-	devpi login $(USER) --password=$(PASSWORD)
+venv:  ## 🐍 Create virtual environment
+	@echo "🐍 Creating virtualenv at $(VENV_DIR)..."
+	@test -d $(VENV_DIR) || python3 -m venv $(VENV_DIR)
 
-build:  ## 🛠️ Build the Python package
-	@echo "Building package..."
-	python -m build
+install-deps: venv  ## 📦 Install devpi-client and twine
+	@echo "📦 Installing devpi-client..."
+	@$(VENV_DIR)/bin/pip install --upgrade pip > /dev/null
+	@$(VENV_DIR)/bin/pip install devpi-client twine > /dev/null
 
-upload:  ## 📦 Upload built package to devpi
-	@echo "Uploading package to devpi..."
-	twine upload --repository-url http://localhost:$(HOST_PORT)/$(INDEX) dist/* -u $(USER) -p $(PASSWORD)
+login-root:  ## 🔐 Login as root user
+	@echo "🔐 Logging in as root..."
+	@$(VENV_DIR)/bin/devpi use $(BASE_URL)
+	@-$(VENV_DIR)/bin/devpi login root --password='rootpassword'
 
-stop:  ## 🛑 Stop and remove devpi container
-	@echo "Stopping devpi container..."
-	-docker stop $(CONTAINER_NAME)
-	-docker rm $(CONTAINER_NAME)
+login:  ## 🔐 Login to Devpi server
+	@echo "[INFO] Logging into Devpi..."
+	@$(VENV_DIR)/bin/devpi use $(BASE_URL)
+	@$(VENV_DIR)/bin/devpi login $(LOCAL_PYPI_USER) --password=$(LOCAL_PYPI_PASSWORD)
 
-clean: stop  ## 🧹 Clean up devpi data
-	@echo "Cleaning up data..."
-	-rm -rf $(DATA_DIR)
+create-user: login-root  ## 👤 Create user if not exists
+	@echo "[INFO] Creating user $(LOCAL_PYPI_USER) if not exists..."
+	@$(VENV_DIR)/bin/devpi user -c $(LOCAL_PYPI_USER) password=$(LOCAL_PYPI_PASSWORD) || echo "User may already exist."
+
+create-index: login-root  ## 📦 Create index if not exists
+	@echo "[INFO] Creating index $(INDEX) if not exists..."
+	@-$(VENV_DIR)/bin/devpi index -c $(FULL_INDEX) bases=root/pypi || echo "Index may already exist."
+	@$(VENV_DIR)/bin/devpi use -l
+
+use-index:  ## 📍 Use target index
+	@echo "[INFO] Switching to index $(FULL_INDEX)..."
+	@$(VENV_DIR)/bin/devpi use $(FULL_INDEX)
+
+upload:  ## 🚀 Upload built package to Devpi
+	@echo "[INFO] Uploading package to Devpi..."
+	@test -d dist || (echo "Missing dist/. Please run 'poetry build' or equivalent first." && exit 1)
+	@$(VENV_DIR)/bin/twine upload -r devpi dist/*
+
+clean: stop  ## 🧹 Clean data and volume
+	@echo "🧹 Cleaning up volume and local data..."
+	@rm -rf $(DATA_DIR) $(VENV_DIR)
+
+init: start venv install-deps create-user create-index use-index  ## 🚀 Full Devpi init flow
+
+build:  ## 🔧 Build package (example with Poetry)
+	@echo "🔧 Building package..."
+	@poetry build
