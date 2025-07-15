@@ -1,22 +1,22 @@
 [project]
 name = "commons_observability"
-version = "0.2.0"
+version = "0.3.0"
 description = ""
 authors = [
     {name = "Priyesh Kannan",email = "10197527+PriyeshKannan@users.noreply.github.com"}
 ]
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = [
-    "opentelemetry-api (>=1.35.0,<2.0.0)",
-    "opentelemetry-sdk (>=1.35.0,<2.0.0)",
-    "opentelemetry-exporter-otlp-proto-grpc (>=1.35.0,<2.0.0)",
-    "commons-service-management (>=0.1.0,<0.2.0)",
-]
 
 [[tool.poetry.packages]]
 include = "observability"
 from = "."
+
+[tool.poetry.dependencies]
+opentelemetry-api = "^1.35.0"
+opentelemetry-sdk="^1.35.0"
+opentelemetry-exporter-otlp-proto-grpc="^1.35.0,<2.0.0"
+commons-service-management = "^0.2.0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.12.3"
@@ -27,7 +27,6 @@ pytest = "^8.4.1"
 devpi = "^2.2.0"
 pytest-cov = "^6.2.1"
 report = "^0.0.1"
-
 
 
 [build-system]

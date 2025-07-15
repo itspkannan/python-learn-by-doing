@@ -1,12 +1,10 @@
-from typing import List, Dict
 
-from service_management.service import Service
-from service_management.status import HealthStatus
+from service_management.core import HealthStatus, Service
 
 
 class ServiceManager:
     def __init__(self):
-        self.services: List[Service] = []
+        self.services: list[Service] = []
 
     def register(self, service: Service):
         self.services.append(service)
@@ -26,16 +24,16 @@ class ServiceManager:
             except Exception as e:
                 print(f"[{service.name}] Failed to stop: {e}")
 
-    def get_health_report(self) -> Dict[str, Dict]:
+    def get_health_report(self) -> dict[str, dict]:
         return {svc.name: svc.health_check() for svc in self.services}
 
-    def get_status(self) -> Dict[str, str]:
+    def get_status(self) -> dict[str, str]:
         return {
             svc.name: f"{svc.running_status.value} / {svc.health_status.value}"
             for svc in self.services
         }
 
-    def get_metrics(self) -> Dict[str, Dict[str, int]]:
+    def get_metrics(self) -> dict[str, dict[str, int]]:
         return {
             svc.name: {
                 "events_processed": svc.events_processed,

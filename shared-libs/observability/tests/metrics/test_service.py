@@ -1,9 +1,9 @@
 import asyncio
+from unittest.mock import MagicMock, patch
 
 import pytest
-from unittest.mock import MagicMock, patch
-from observability.metrics.service import MetricsService
 from observability.config import MetricsConfig
+from observability.metrics.service import MetricsService
 
 
 @pytest.fixture

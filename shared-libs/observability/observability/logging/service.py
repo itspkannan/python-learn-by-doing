@@ -1,11 +1,20 @@
 import logging
 
+from service_management.core import Service
+
 from observability.config import LoggingConfig
 
 
-class LoggingService:
+class LoggingService(Service):
     def __init__(self, logging_config: LoggingConfig = None) -> None:
+        super().__init__("LoggingService")
         self.logging_config = logging_config or LoggingConfig.from_env()
+
+    async def on_start(self):
+        self.logger.info(f"{self.name} started")
+
+    async def on_stop(self):
+        self.logger.info(f"{self.name} stopped.")
 
     def get_logger(self, name: str = None):
         logger_name = name or self.logging_config.service_name

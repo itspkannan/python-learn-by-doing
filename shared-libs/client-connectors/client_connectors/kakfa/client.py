@@ -1,13 +1,17 @@
 import json
 
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
+from service_management.service import Service
+from service_management.status import HealthStatus
 
 from client_connectors.kakfa.config import KafkaConfig
 
 
-class KafkaConsumerClient:
+class KafkaConsumerClient(Service):
     def __init__(self, config: KafkaConfig = None):
+        super().__init__("KafkaConsumerClient")
         self.config = config or KafkaConfig.from_env()
+        self._consumer = None
         self._consumer = None
         self._running = False
 
@@ -40,24 +44,50 @@ class KafkaConsumerClient:
         self._running = False
 
 
-class KafkaProducerClient:
-    def __init__(self, config: KafkaConfig = None):
+from opentelemetry import trace
+
+class KafkaProducerClient(Service):
+    def __init__(self, config: KafkaProducerClient = None):
+        super().__init__("KafkaClient")
         self.config = config or KafkaConfig.from_env()
         self._producer = None
 
     async def start(self):
-        self._producer = AIOKafkaProducer(
-            bootstrap_servers=self.config.bootstrap_servers,
-            security_protocol="SSL" if self.config.enable_ssl else "PLAINTEXT",
-            value_serializer=lambda v: json.dumps(v).encode("utf-8"),
-        )
-        await self._producer.start()
+        await super().start()
+        try:
+            self._producer = AIOKafkaProducer(
+                bootstrap_servers=self.config.bootstrap_servers,
+                security_protocol="SSL" if self.config.enable_ssl else "PLAINTEXT",
+                value_serializer=lambda v: json.dumps(v).encode("utf-8"),
+            )
+            await self._producer.start()
+            self.health_status = HealthStatus.HEALTHY
+        except Exception as e:
+            self.health_status = HealthStatus.ERROR
+            self.logger.error(f"Failed to start KafkaProducer: {e}")
+            raise e
 
     async def send(self, key: str, value: dict):
         if not self._producer:
             raise RuntimeError("Producer not started. Call start().")
-        await self._producer.send_and_wait(self.config.topic, key=key.encode("utf-8"), value=value)
 
-    async def stop(self):
-        if self._producer:
-            await self._producer.stop()
+        async with self.tracer.start_as_current_span("KafkaClient.send") as span:
+            span.set_attribute("messaging.system", "kafka")
+            span.set_attribute("messaging.destination", self.config.topic)
+            span.set_attribute("messaging.kafka.message_key", key)
+
+            await self._producer.send_and_wait(
+                self.config.topic,
+                key=key.encode("utf-8"),
+                value=value,
+            )
+
+            self.increment_events()
+            if self.metrics:
+                with self.metrics.record(
+                    name=f"{self.name}.events.count",
+                    metric_type="counter",
+                    attributes={"topic": self.config.topic}
+                ) as inc:
+                    inc()
+

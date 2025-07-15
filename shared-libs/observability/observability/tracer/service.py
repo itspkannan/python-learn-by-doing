@@ -4,25 +4,31 @@ from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import ConsoleSpanExporter, SimpleSpanProcessor
 from opentelemetry.trace import Tracer
+from service_management.core import Service
 
 from observability.config import TracingConfig
 
 
-class TracingService:
+class TracingService(Service):
     def __init__(self, tracing_config: TracingConfig) -> None:
+        super().__init__("TracingService")
+        self.tracer: Tracer | None = None
         self.tracing_config = tracing_config or TracingConfig.from_env()
         if self.tracing_config.enabled:
             provider = TracerProvider()
             processor = SimpleSpanProcessor(ConsoleSpanExporter())
             provider.add_span_processor(processor)
             trace.set_tracer_provider(provider)
-        self.tracer: Tracer = trace.get_tracer(self.tracing_config.service_name)
+            self.tracer = trace.get_tracer(self.tracing_config.service_name)
 
-    def get_tracer(self) -> Tracer:
-        return self.tracer
+    async def on_start(self):
+        self.logger.info(
+            "TracingService started with tracking enabled = %s", self.tracing_config.enabled
+        )
 
-    def is_enabled(self) -> bool:
-        return self.tracing_config.enabled
+    async def on_stop(self):
+        self.logger.info("TracingService stopped.")
+        self.tracer = None
 
     @asynccontextmanager
     async def start_span(self, name: str):

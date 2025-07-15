@@ -1,3 +1,6 @@
-__all__ = ('ObservabilityService', 'ObservabilityConfig', )
+__all__ = (
+    "ObservabilityConfig",
+    "ObservabilityService",
+)
 
-from .observability_service import ObservabilityService, ObservabilityConfig
+from .observability_service import ObservabilityConfig, ObservabilityService

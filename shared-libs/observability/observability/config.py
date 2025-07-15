@@ -46,3 +46,9 @@ class ObservabilityConfig:
     logging_config: LoggingConfig
     metric_config: MetricsConfig
     tracing_config: TracingConfig
+
+    @staticmethod
+    def from_env() -> ObservabilityConfig:
+        return ObservabilityConfig(
+            LoggingConfig.from_env(), MetricsConfig.from_env(), TracingConfig.from_env()
+        )

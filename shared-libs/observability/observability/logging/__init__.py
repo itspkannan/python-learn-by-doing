@@ -1,3 +1,3 @@
-__all__ = ("LoggingService", )
+__all__ = ("LoggingService",)
 
 from .service import LoggingService

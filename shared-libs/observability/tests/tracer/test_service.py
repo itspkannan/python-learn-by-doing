@@ -5,15 +5,8 @@ from tests.tracer.conftest import _make_service
 
 def test_get_tracer_returns_same_instance(mocker):
     service, tracer_mock, _ = _make_service(mocker, enabled=True)
-    assert service.get_tracer() is tracer_mock
-
-
-def test_is_enabled_reflects_config(mocker):
-    svc_true, _, _ = _make_service(mocker, enabled=True)
-    svc_false, _, _ = _make_service(mocker, enabled=False)
-
-    assert svc_true.is_enabled() is True
-    assert svc_false.is_enabled() is False
+    service.tracer
+    assert service.tracer is tracer_mock
 
 
 @pytest.mark.asyncio
