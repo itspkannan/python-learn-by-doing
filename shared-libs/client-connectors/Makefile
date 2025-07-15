@@ -94,3 +94,8 @@ test.python:  ## ✅ Run tests with Pytest and show coverage
 
 .PHONY: test
 test:  test.python ## ✅ Run tests
+
+# Remove hardcoding of secret for now local dev it is fine
+publish:
+	@poetry config repositories.devpi http://localhost:3141/pypiuser/dev
+	@poetry publish -r localpypi --username pypiuser --password secret
