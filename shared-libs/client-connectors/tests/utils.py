@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from unittest.mock import AsyncMock, Mock
 
+
 class MockObservabilityService:
     def __init__(self):
         self.tracing_service = Mock()

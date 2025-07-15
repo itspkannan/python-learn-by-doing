@@ -1,10 +1,11 @@
-from abc import ABC
-import httpx
 import logging
+from abc import ABC
 
+import httpx
 from observability import ObservabilityService
 
 _logger = logging.getLogger(__name__)
+
 
 class AbstractBaseHttpClient(ABC):
     def __init__(self, timeout: float = 10.0):
@@ -43,9 +44,11 @@ class AbstractBaseHttpClient(ABC):
     async def close(self):
         await self.client.aclose()
 
+
 class AsyncHTTPClient(AbstractBaseHttpClient):
     def __int__(self, timeout: float = 10.0):
         super().__init__(timeout)
+
 
 class TracedAsyncHTTPClient(AbstractBaseHttpClient):
     def __init__(self, observability_service: ObservabilityService, timeout: float = 10.0):

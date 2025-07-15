@@ -19,6 +19,5 @@ class KafkaConfig:
             bootstrap_servers=os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092"),
             topic=os.getenv("KAFKA_TOPIC", "company_news"),
             group_id=os.getenv("KAFKA_GROUP_ID", "default-group"),
-            enable_ssl=os.getenv("KAFKA_ENABLE_SSL", "false").lower()
-            in ("1", "true", "yes", "on"),
+            enable_ssl=os.getenv("KAFKA_ENABLE_SSL", "false").lower() in ("1", "true", "yes", "on"),
         )

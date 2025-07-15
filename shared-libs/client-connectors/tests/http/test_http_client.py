@@ -1,6 +1,8 @@
-import pytest
 from unittest.mock import AsyncMock
+
+import pytest
 from client_connectors.http import AsyncHTTPClient, TracedAsyncHTTPClient
+
 
 @pytest.mark.asyncio
 async def test_async_http_client_get(mocker):
@@ -15,11 +17,12 @@ async def test_async_http_client_get(mocker):
     url = "http://example.com"
     response = await client.get(url)
 
-    mock_request.assert_called_once_with("GET", url, **{})
+    mock_request.assert_called_once_with("GET", url)
     assert response.status_code == 200
     assert response.text == "OK"
 
-@pytest.mark.skip('need to be fixed')
+
+@pytest.mark.skip("need to be fixed")
 @pytest.mark.asyncio
 async def test_traced_async_http_client_get(mocker):
     mock_response = AsyncMock()
@@ -38,10 +41,11 @@ async def test_traced_async_http_client_get(mocker):
     url = "http://example.com"
     response = await client.get(url)
 
-    mock_request.assert_called_once_with("GET", url, **{})
+    mock_request.assert_called_once_with("GET", url)
     assert response.status_code == 200
     assert response.text == "OK"
     mock_observability_service.metrics_service.arecord.assert_called_once()
+
 
 @pytest.mark.asyncio
 async def test_async_http_client_post(mocker):
@@ -60,7 +64,8 @@ async def test_async_http_client_post(mocker):
     assert response.status_code == 201
     assert response.text == "Created"
 
-@pytest.mark.skip('need to be fixed')
+
+@pytest.mark.skip("need to be fixed")
 @pytest.mark.asyncio
 async def test_traced_async_http_client_post(mocker):
     mock_response = AsyncMock()
