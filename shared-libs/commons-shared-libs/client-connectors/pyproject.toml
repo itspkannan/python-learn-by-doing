@@ -1,0 +1,69 @@
+[project]
+name = "commons_connector"
+version = "0.4.4"
+description = ""
+authors = [
+    {name = "Priyesh Kannan",email = "10197527+PriyeshKannan@users.noreply.github.com"}
+]
+readme = "README.md"
+
+[tool.poetry]
+packages = [{include = "client_connectors", from="."}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+httpx = { extras = ["http2", "socks"], version = ">=0.28.1,<0.29.0" }
+websockets = ">=15.0.1,<16.0.0"
+aiokafka = ">=0.12.0,<0.13.0"
+elasticsearch = { extras = ["async"], version = "==8.12.0" }
+commons-observability = "^0.4.0"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.12.3"
+mypy = "^1.16.1"
+pytest-asyncio = "^1.0.0"
+pytest-mock = "^3.14.1"
+pytest = "^8.4.1"
+devpi = "^2.2.0"
+pytest-cov = "^6.2.1"
+report = "^0.0.1"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+fix = true
+src = ["observability"]
+exclude = ["test/*"]
+
+[tool.ruff.format]
+quote-style = "preserve"
+indent-style = "space"
+line-ending = "auto"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = ["D203", "D212", "COM812"]
+exclude = ["test/*"]
+
+[tool.mypy]
+strict = true
+
+[tool.pytest.ini_options]
+addopts = "-ra -q --cov=client_connectors --cov-report=term-missing"
+testpaths = ["tests"]
+
+
+[[tool.poetry.source]]
+name = "pypi"
+priority = "supplemental"
+
+
+[[tool.poetry.source]]
+name = "localpypi"
+url = "http://127.0.0.1:3141/pypiuser/dev/+simple/"
+priority = "primary"
