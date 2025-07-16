@@ -67,13 +67,13 @@ class TracedAsyncHTTPClient(AbstractBaseHttpClient):
     def __init__(self, timeout: float = 10.0):
         super().__init__(timeout)
 
-    # @trace_span_async("HttpClient.request", attributes_fn=http_attributes)
-    # @record_metric_async(
-    #     name="HttpClient.request.duration",
-    #     metric_type="histogram",
-    #     unit="s",
-    #     attributes_fn=http_attributes,
-    # )
+    @trace_span_async("HttpClient.request", attributes_fn=http_attributes)
+    @record_metric_async(
+        name="HttpClient.request.duration",
+        metric_type="histogram",
+        unit="s",
+        attributes_fn=http_attributes,
+    )
     async def request(self, method: str, url: str, **kwargs):
         response = await self.client.request(method, url, **kwargs)
         _logger.info(f"{method.upper()} {url} → {response.status_code}")

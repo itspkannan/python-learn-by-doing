@@ -1,4 +1,5 @@
 import json
+from typing import Any
 
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 from observability.metrics.decorator import record_metric_async
@@ -8,6 +9,7 @@ from service_management.core.status import HealthStatus
 
 from client_connectors.kakfa.config import KafkaConfig
 from client_connectors.kakfa.interfaces import KafkaMessageHandler
+from client_connectors.kakfa.serializer import KafkaSerializer
 
 
 def kafka_attributes(self, key: str, value: dict):
@@ -77,6 +79,7 @@ class KafkaProducerClient(Service):
         super().__init__("KafkaClient")
         self.config = config or KafkaConfig.from_env()
         self._producer = None
+        self.serializer = KafkaSerializer()
 
     async def before_start(self):
         try:
@@ -108,13 +111,14 @@ class KafkaProducerClient(Service):
         metric_type="counter",
         attributes_fn=kafka_attributes,
     )
-    async def send(self, key: str, value: dict):
+    async def send(self, key: str, value: Any):
         if not self._producer:
-            raise RuntimeError("Producer not started. Call start().")
+            raise RuntimeError("Producer not started")
+
+        serialized_value = self.serializer.serialize(value)
 
         await self._producer.send_and_wait(
-            self.config.topic,
+            topic=self.topic,
             key=key.encode("utf-8"),
-            value=value,
+            value=serialized_value,
         )
-        self.increment_events()
