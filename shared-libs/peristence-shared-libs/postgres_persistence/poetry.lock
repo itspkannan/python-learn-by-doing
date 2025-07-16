@@ -230,14 +230,14 @@ reference = "localpypi"
 
 [[package]]
 name = "commons-observability"
-version = "0.5.1"
+version = "0.6.0"
 description = ""
 optional = false
 python-versions = ">=3.12,<4.0"
 groups = ["main"]
 files = [
-    {file = "commons_observability-0.5.1-py3-none-any.whl", hash = "sha256:fcdeb6f1ea2444926191d2e111f60ded63bd87f138e43c27f2aacfb7440672b5"},
-    {file = "commons_observability-0.5.1.tar.gz", hash = "sha256:009942cf931e4ee73cec76b8c29b39ebedc2e40d5ee241da07b5d30f621d292a"},
+    {file = "commons_observability-0.6.0-py3-none-any.whl", hash = "sha256:9dbf6cb3608b00d048443d9f843a86f4f6d40146ad54168c19440994ebd69595"},
+    {file = "commons_observability-0.6.0.tar.gz", hash = "sha256:53b6de0d20ed25900dc33485b5c9ed8cca8f002959d3a20a4d125eedf01312d3"},
 ]
 
 [package.dependencies]
@@ -253,14 +253,14 @@ reference = "localpypi"
 
 [[package]]
 name = "commons-service-management"
-version = "0.2.4"
+version = "0.3.0"
 description = ""
 optional = false
 python-versions = ">=3.12"
 groups = ["main"]
 files = [
-    {file = "commons_service_management-0.2.4-py3-none-any.whl", hash = "sha256:9ab1b38866b6aaa8b16097f356b4d80fc7cb753d2909ca03e1373ef29fae86a5"},
-    {file = "commons_service_management-0.2.4.tar.gz", hash = "sha256:3fc97324bda28eb8eb348e89b47903a42bf1490b2d8b5ed13ad4dfb6142abd3f"},
+    {file = "commons_service_management-0.3.0-py3-none-any.whl", hash = "sha256:9c4aca6c75499d162ff72adbaf2cd15d015c78553d6f0d30fd95bd5d3da9dc85"},
+    {file = "commons_service_management-0.3.0.tar.gz", hash = "sha256:9d62c8a6d4fac3c234d601d63a1615d744b758bc813b688527e63127b39b452a"},
 ]
 
 [package.source]

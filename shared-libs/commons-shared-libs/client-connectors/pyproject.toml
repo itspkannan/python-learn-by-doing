@@ -1,6 +1,6 @@
 [project]
 name = "commons_connector"
-version = "0.5.2"
+version = "0.6.0"
 description = ""
 authors = [
     {name = "Priyesh Kannan",email = "10197527+PriyeshKannan@users.noreply.github.com"}
@@ -17,7 +17,7 @@ httpx = { extras = ["http2", "socks"], version = ">=0.28.1,<0.29.0" }
 websockets = ">=15.0.1,<16.0.0"
 aiokafka = ">=0.12.0,<0.13.0"
 elasticsearch = { extras = ["async"], version = "==8.12.0" }
-commons-observability = "^0.5.1"
+commons-observability = ">=0.4.2,<2.0.0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.12.3"

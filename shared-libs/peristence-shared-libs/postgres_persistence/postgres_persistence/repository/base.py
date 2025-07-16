@@ -1,6 +1,7 @@
 from collections.abc import Sequence
 from typing import Any, Generic, TypeVar
 
+from service_management.core.registry import Registry
 from sqlalchemy import Row, RowMapping, select
 from sqlalchemy.orm import DeclarativeBase
 
@@ -15,7 +16,10 @@ T = TypeVar("T", bound=Base)
 
 
 class BaseRepository(Generic[T]):
-    def __init__(self, model: type[T], client: PostgresClient):
+    def __init__(self, model: type[T]):
+        client: PostgresClient = Registry.resolve(PostgresClient, default=None)
+        if not client:
+            raise RuntimeError("Postgress Client Service not initialzied")
         self.model = model
         self.client = client
 

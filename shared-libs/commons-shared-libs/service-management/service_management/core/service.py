@@ -24,6 +24,7 @@ class Service(ABC):
         self.running_status = RunningStatus.STARTED
         self.health_status = HealthStatus.HEALTHY
         Registry.register_instance(self.name, self)
+        Registry.register_instance(self.__class__, self)
         self.__log_status_change("Started", start_timestamp)
         await self.after_start()
 

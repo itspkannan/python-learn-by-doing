@@ -28,7 +28,7 @@ class PostgresClient(Service):
         retry=retry_if_exception_type(OperationalError),
         reraise=True,
     )
-    def before_start(self):
+    async def before_start(self):
         logger.info(f"Creating engine with URI: {self.config.uri}")
         logger.info("Initializing PostgresClient with retry and connection pooling")
         self.engine = create_async_engine(
