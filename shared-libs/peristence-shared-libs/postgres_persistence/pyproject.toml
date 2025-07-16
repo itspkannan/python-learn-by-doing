@@ -1,6 +1,6 @@
 [project]
 name = "postgres-persistence"
-version = "0.3.3"
+version = "0.3.4"
 description = ""
 authors = [
     {name = "Priyesh Kannan",email = "10197527+PriyeshKannan@users.noreply.github.com"}
