@@ -14,9 +14,8 @@ class TracingConfig:
     def from_env() -> TracingConfig:
         return TracingConfig(
             service_name=os.getenv("SERVICE_NAME"),
-            enabled=bool(os.getenv("TRACING_ENABLED", "False")),
+            enabled=os.getenv("TRACING_ENABLED", "false").lower() == "true",
         )
-
 
 @dataclass(frozen=True)
 class LoggingConfig:
@@ -37,7 +36,7 @@ class MetricsConfig:
     def from_env() -> MetricsConfig:
         return MetricsConfig(
             service_name=os.getenv("SERVICE_NAME"),
-            enabled=bool(os.getenv("METRICS_ENABLED", "False")),
+            enabled=os.getenv("METRICS_ENABLED", "false").lower() == "true",
         )
 
 

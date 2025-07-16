@@ -161,14 +161,14 @@ reference = "localpypi"
 
 [[package]]
 name = "commons-observability"
-version = "0.6.1"
+version = "0.6.2"
 description = ""
 optional = false
 python-versions = ">=3.12,<4.0"
 groups = ["main"]
 files = [
-    {file = "commons_observability-0.6.1-py3-none-any.whl", hash = "sha256:f32528884ddb5d4661a76a35f197bf23c3675ab4ee20ffc497f8cfdfd61966cf"},
-    {file = "commons_observability-0.6.1.tar.gz", hash = "sha256:100b59a17c17c61edd10ad82d6eb59bd06916ab78e41715ed811316f91fce026"},
+    {file = "commons_observability-0.6.2-py3-none-any.whl", hash = "sha256:5f09d2db15bfefde171a64825605dbcdb3a0c90505dfeea8e22430fb118d6b8a"},
+    {file = "commons_observability-0.6.2.tar.gz", hash = "sha256:1de6fcbd8634e9857301f350099d95c9fc6982165b255da6889bc3fecbe0f870"},
 ]
 
 [package.dependencies]

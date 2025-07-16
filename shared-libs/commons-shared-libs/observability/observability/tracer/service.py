@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager, contextmanager
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import ConsoleSpanExporter, SimpleSpanProcessor
-from opentelemetry.trace import Tracer
+from opentelemetry.trace import Tracer, NoOpTracerProvider
 from service_management.core.service import Service
 
 from observability.config import TracingConfig
@@ -20,6 +20,11 @@ class TracingService(Service):
             provider.add_span_processor(processor)
             trace.set_tracer_provider(provider)
             self.tracer = trace.get_tracer(self.tracing_config.service_name)
+        else:
+            trace.set_tracer_provider(NoOpTracerProvider())
+            self.tracer = trace.get_tracer("noop-service")
+
+        self.logger.info(f"Tracing initialized: {self.tracing_config.enabled} for {self.tracing_config.service_name}")
 
     async def before_start(self):
         pass
