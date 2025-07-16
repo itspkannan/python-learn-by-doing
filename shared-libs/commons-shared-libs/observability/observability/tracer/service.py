@@ -30,7 +30,7 @@ class TracingService(Service):
         )
 
     async def before_stop(self):
-        self.logger.info(f"{self.before_stop()} stopping.")
+        self.logger.info(f"{self.name} stopping.")
         self.tracer = None
 
     async def after_stop(self):

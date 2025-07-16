@@ -33,7 +33,7 @@ class MetricsService(Service):
         )
 
     async def before_stop(self):
-        self.logger.info(f"{self.before_stop()} stopping.")
+        self.logger.info(f"{self.name} stopping.")
         self.meter = None
 
     async def after_stop(self):
