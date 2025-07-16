@@ -758,5 +758,5 @@ reference = "localpypi"
 
 [metadata]
 lock-version = "2.1"
-python-versions = ">=3.12"
-content-hash = "f7f3d97d852ab96bbe81ae8b4409a111c7c5eb84190fce4a47a53dd48d34550f"
+python-versions = "^3.12"
+content-hash = "9abb1b753a9edf4aefca01bb914cdbeed43efc7950f980450a595c5c199bccbb"

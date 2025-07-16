@@ -28,10 +28,19 @@ def trace_span_async(span_name: str, attributes_fn=None):
                 try:
                     tracing_service = Registry.resolve(TracingService)
                 except Exception:
-                    return None
+                    tracing_service = None
 
-            cm = tracing_service.start_span(span_name) if tracing_service else _null_async_cm()
-            attributes = attributes_fn(self, *args, **kwargs) if attributes_fn else {}
+            cm = (
+                tracing_service.start_span(span_name)
+                if tracing_service else _null_async_cm()
+            )
+            attributes = {}
+            try:
+                if attributes_fn:
+                    attributes = attributes_fn(self, *args, **kwargs) or {}
+            except Exception:
+                attributes = {}
+
             async with cm as span:
                 if span and attributes:
                     for k, v in attributes.items():
@@ -47,22 +56,36 @@ def trace_span_sync(span_name: str, attributes_fn=None):
     def decorator(func):
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
-            tracing_service = (
-                getattr(self, "tracing_service", None)
-                or getattr(self, "tracer", None)
-                or Registry.resolve(TracingService, default=None)
-            )
-            if not tracing_service:
-                return None
+            try:
+                tracing_service = (
+                    getattr(self, "tracing_service", None)
+                    or getattr(self, "tracer", None)
+                    or Registry.resolve(TracingService, default=None)
+                )
+            except Exception:
+                tracing_service = None
 
-            cm = tracing_service.start_span_sync(span_name) if tracing_service else _null_cm()
-            attributes = attributes_fn(self, *args, **kwargs) if attributes_fn else {}
+            cm = (
+                tracing_service.start_span_sync(span_name)
+                if tracing_service else _null_cm()
+            )
+
+            attributes = {}
+            try:
+                if attributes_fn:
+                    attributes = attributes_fn(self, *args, **kwargs) or {}
+            except Exception:
+                # Silently ignore faulty attribute function
+                attributes = {}
 
             with cm as span:
                 if span and attributes:
-                    span.set_attributes(attributes)
+                    try:
+                        span.set_attributes(attributes)
+                    except Exception:
+                        pass
                 return func(self, *args, **kwargs)
 
         return wrapper
-
     return decorator
+

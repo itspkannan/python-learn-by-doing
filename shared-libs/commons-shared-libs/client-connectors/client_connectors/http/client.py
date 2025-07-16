@@ -1,5 +1,5 @@
 import logging
-from abc import ABC
+from abc import ABC, abstractmethod
 
 import httpx
 from observability.metrics.decorator import record_metric_async
@@ -20,14 +20,9 @@ class AbstractBaseHttpClient(ABC):
     def __init__(self, timeout: float = 10.0):
         self.client = httpx.AsyncClient(timeout=timeout)
 
+    @abstractmethod
     async def request(self, method: str, url: str, **kwargs):
-        try:
-            response = await self.client.request(method, url, **kwargs)
-            _logger.info(f"{method.upper()} {url} → {response.status_code}")
-            return response
-        except Exception as e:
-            _logger.error(f"{method.upper()} {url} failed: {e}")
-            raise
+        pass
 
     async def get(self, url: str, **kwargs):
         return await self.request("GET", url, **kwargs)
@@ -58,18 +53,27 @@ class AsyncHTTPClient(AbstractBaseHttpClient):
     def __int__(self, timeout: float = 10.0):
         super().__init__(timeout)
 
+    async def request(self, method: str, url: str, **kwargs):
+        try:
+            response = await self.client.request(method, url, **kwargs)
+            _logger.info(f"{method.upper()} {url} → {response.status_code}")
+            return response
+        except Exception as e:
+            _logger.error(f"{method.upper()} {url} failed: {e}")
+            raise
+
 
 class TracedAsyncHTTPClient(AbstractBaseHttpClient):
     def __init__(self, timeout: float = 10.0):
         super().__init__(timeout)
 
-    @trace_span_async("HttpClient.request", attributes_fn=http_attributes)
-    @record_metric_async(
-        name="HttpClient.request.duration",
-        metric_type="histogram",
-        unit="s",
-        attributes_fn=http_attributes,
-    )
+    # @trace_span_async("HttpClient.request", attributes_fn=http_attributes)
+    # @record_metric_async(
+    #     name="HttpClient.request.duration",
+    #     metric_type="histogram",
+    #     unit="s",
+    #     attributes_fn=http_attributes,
+    # )
     async def request(self, method: str, url: str, **kwargs):
         response = await self.client.request(method, url, **kwargs)
         _logger.info(f"{method.upper()} {url} → {response.status_code}")

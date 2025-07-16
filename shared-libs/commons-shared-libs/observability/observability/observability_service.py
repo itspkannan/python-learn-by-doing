@@ -8,11 +8,12 @@ from .tracer.service import TracingService
 
 class ObservabilityService(Service):
 
-    def __init__(self, observability: ObservabilityConfig) -> None:
+    def __init__(self, observability_config: ObservabilityConfig = None) -> None:
         super().__init__("ObservabilityService")
-        self.logging_service = LoggingService(observability.logging_config)
-        self.tracing_service = TracingService(observability.tracing_config)
-        self.metrics_service = MetricsService(observability.metric_config)
+        observability_config = observability_config or ObservabilityConfig.from_env()
+        self.logging_service = LoggingService(observability_config.logging_config)
+        self.tracing_service = TracingService(observability_config.tracing_config)
+        self.metrics_service = MetricsService(observability_config.metric_config)
 
     async def before_start(self):
         for service in [self.logging_service, self.tracing_service, self.metrics_service]:

@@ -1,22 +1,22 @@
 [project]
 name = "commons_observability"
-version = "0.4.2"
+version = "0.5.1"
 description = ""
 authors = [
     {name = "Priyesh Kannan",email = "10197527+PriyeshKannan@users.noreply.github.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.12"
 
 [[tool.poetry.packages]]
 include = "observability"
 from = "."
 
 [tool.poetry.dependencies]
+python = "^3.12"
 opentelemetry-api = "^1.35.0"
 opentelemetry-sdk="^1.35.0"
 opentelemetry-exporter-otlp-proto-grpc="^1.35.0,<2.0.0"
-commons-service-management = "^0.2.0"
+commons-service-management = ">=0.2.0,<1.0.0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.12.3"
