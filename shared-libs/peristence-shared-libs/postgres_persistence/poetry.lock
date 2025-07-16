@@ -230,18 +230,18 @@ reference = "localpypi"
 
 [[package]]
 name = "commons-observability"
-version = "0.4.2"
+version = "0.5.1"
 description = ""
 optional = false
-python-versions = ">=3.12"
+python-versions = ">=3.12,<4.0"
 groups = ["main"]
 files = [
-    {file = "commons_observability-0.4.2-py3-none-any.whl", hash = "sha256:d3cb8f2da6b1128ddba824d642001f7453c06454eea9bf7ce8b9e7e11c1c1f18"},
-    {file = "commons_observability-0.4.2.tar.gz", hash = "sha256:626596e735005f132e30b48e049e442114ad22289f4c31e66db50c9513d66c1e"},
+    {file = "commons_observability-0.5.1-py3-none-any.whl", hash = "sha256:fcdeb6f1ea2444926191d2e111f60ded63bd87f138e43c27f2aacfb7440672b5"},
+    {file = "commons_observability-0.5.1.tar.gz", hash = "sha256:009942cf931e4ee73cec76b8c29b39ebedc2e40d5ee241da07b5d30f621d292a"},
 ]
 
 [package.dependencies]
-commons-service-management = ">=0.2.0,<0.3.0"
+commons-service-management = ">=0.2.0,<1.0.0"
 opentelemetry-api = ">=1.35.0,<2.0.0"
 opentelemetry-exporter-otlp-proto-grpc = ">=1.35.0,<2.0.0"
 opentelemetry-sdk = ">=1.35.0,<2.0.0"
@@ -1657,5 +1657,5 @@ reference = "localpypi"
 
 [metadata]
 lock-version = "2.1"
-python-versions = ">=3.12,<4.0.0"
-content-hash = "793ea6a7505f3fcb508ebdba2e95e3024df949e8243580ff80e6ebe54229e3e1"
+python-versions = "^3.12"
+content-hash = "e8a15f04cb30d765c5f63e9a7663e023aa686ccc6e2d0328f1e41adf04df73b5"

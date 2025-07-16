@@ -36,7 +36,7 @@ help:  ## 📖 Help message
 .PHONY: init.python
 init.python: ## 🧰 Initialize the Poetry development environment
 	@echo "[Info] $(PROJECT_DESCRIPTION) Initialization of development Environment - Started"
-	$(eval PYTHON_VERSION=$(shell asdf list python | grep '^  3\.12' | tr -d '*[:space:]' | sort -V | tail -1|xargs))
+	$(eval PYTHON_VERSION=$(shell asdf list python | grep '3.12' | tr -d '*[:space:]' | sort -V | tail -1|xargs))
 	@echo "Python Version : $(PYTHON_VERSION)"
 	@poetry env use $(PYTHON_VERSION)
 	@$(POETRY) config virtualenvs.in-project true && \
@@ -45,8 +45,8 @@ init.python: ## 🧰 Initialize the Poetry development environment
 		$(POETRY) install --no-root
 	@echo "[Info] $(PROJECT_DESCRIPTION) Initialization of development Environment - Completed"
 
-.PHONY: init.python
-init: ## 🧰 Initialize the development environment
+.PHONY: init
+init: init.python ## 🧰 Initialize the development environment
 
 .PHONY: build.python
 build.python: ## 🐍 Build python source
